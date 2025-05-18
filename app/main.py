@@ -15,12 +15,6 @@ class Student:
         "Flask": 0
     })
     completed_course: set = field(default_factory=set)
-    
-    def check_completion_before(self, course: str) -> bool:
-        if course not in self.completed_course:
-            self.completed_course.add(course)
-            return True
-        return False
                
 class Course:
     def __init__(self, name: str) -> None:
