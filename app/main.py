@@ -14,7 +14,14 @@ class Student:
         "Databases": 0,
         "Flask": 0
     })
+    completed_course: set = field(default_factory=set)
     
+    def check_completion_before(self, course: str) -> bool:
+        if course not in self.completed_course:
+            self.completed_course.add(course)
+            return True
+        return False
+               
 class Course:
     def __init__(self, name: str) -> None:
         self.name = name
@@ -47,7 +54,8 @@ class LearningProgressTracker:
                         "list": self.list_std,
                         "add_points": self.add_points,
                         "find": self.find_std,
-                        "statistics": self.stats
+                        "statistics": self.stats,
+                        "notify": self.notify
                         }
         self.categories = {"Most popular": "n/a",
                            "Least popular": "n/a",
@@ -234,6 +242,24 @@ class LearningProgressTracker:
                         print(f"{std[0]}   {std[1]}  {std[2]}%")                   
             else:
                 print("Unknown course")
+                
+    def notify(self):
+        counter = 0
+        for stu in self.students.values():
+            notified = False
+            for course, crs_obj in self.courses.items():
+                point = stu.courses[course]
+                max_point = crs_obj.max_point
+                if point >= max_point and course not in stu.completed_course:
+                    stu.completed_course.add(course)
+                    full_name = f"{stu.first_name} {stu.last_name}"
+                    print(f"To: {stu.email}")
+                    print("Re: Your Learning Progress")
+                    print(f"Hello, {full_name}! You have accomplished our {course} course!")
+                    notified =True
+            if notified:
+                counter += 1       
+        print(f"Total {counter} students have been notified.")
                 
     def run(self) -> None:
         try:
